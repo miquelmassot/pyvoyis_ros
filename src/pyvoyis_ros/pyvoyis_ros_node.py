@@ -4,6 +4,7 @@
 
 import rospy
 import rospkg
+from pathlib import Path
 from std_srvs.srv import Empty
 
 from pyvoyis import Configuration, VoyisAPI
@@ -14,19 +15,34 @@ class VoyisROS:
         rospy.init_node("pyvoyis_ros_node", log_level=rospy.INFO)
 
         rospack = rospkg.RosPack()
-        package_path = rospack.get_path("pyvoyis_ros")
-        default_configuration_file = package_path + "/configuration.yaml"
 
-        # Offer start_acquisition service
-        rospy.Service("~start_acquisition", Empty, self.start_acquisition_srv_cb)
-        rospy.Service("~stop_acquisition", Empty, self.stop_acquisition_srv_cb)
+        try:
+            package_path = rospack.get_path("pyvoyis_ros")
+        except rospkg.ResourceNotFound:
+            rospy.logerr("pyvoyis_ros package not found")
+            return
 
+        default_configuration_file = Path(package_path) / "configuration.yaml"
+
+        if not default_configuration_file.is_file():
+            rospy.logerr("Default configuration file not found")
+            rospy.logerr("Please create a configuration file in {}".format(default_configuration_file))
+            return
 
         # Get parameters
-        configuration_file = rospy.get_param("~configuration_file", default_configuration_file)
+        configuration_file = rospy.get_param(
+            "~configuration_file",
+            str(default_configuration_file))
 
         self.config = Configuration(configuration_file)
         self.api = VoyisAPI(self.config)
+
+        # Offer start_acquisition service
+        rospy.Service("~start_acquisition", Empty, self.start_acquisition_srv_cb)
+        # Offer stop_acquisition service
+        rospy.Service("~stop_acquisition", Empty, self.stop_acquisition_srv_cb)
+
+        self.api.run()
 
         # Spin as a single-threaded node
         rospy.spin()
