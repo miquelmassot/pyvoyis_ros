@@ -1,0 +1,5 @@
+<launch>
+    <node pkg="pyvoyis_ros" type="pyvoyis_ros_node.py" name="pyvoyis_ros" output="screen">
+        <arg name="configuration_file" value="$(find voyis_ros)/config/pyvoyis_ros.yaml" />
+    </node>
+</launch>
