@@ -1,5 +1,9 @@
 <launch>
     <node pkg="pyvoyis_ros" type="pyvoyis_ros_node.py" name="pyvoyis_ros" output="screen">
-        <arg name="configuration_file" value="$(find voyis_ros)/config/pyvoyis_ros.yaml" />
+        <param name="configuration_file" value="$(find pyvoyis_ros)/config/pyvoyis_ros.yaml" />
+    </node>
+
+    <node pkg="aliencontrol" type="aliencontrol" name="aliencontrol_top" output="screen">
+        <param name="cmd" value="python3 $(find pyvoyis_ros)/src/pyvoyis_ros/python3_bridge.py"/>
     </node>
 </launch>

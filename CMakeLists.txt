@@ -54,7 +54,6 @@ catkin_python_setup()
 # # catkin specific configuration ##
 # ##################################
 catkin_package(
-
   # INCLUDE_DIRS include
   # LIBRARIES pyvoyis_ros
   # CATKIN_DEPENDS other_catkin_pkg

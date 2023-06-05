@@ -1,59 +1,54 @@
-#!/usr/bin/env python3
+#!/usr/bin/env python
 # -*- coding: utf-8 -*-
 
 
 import rospy
-import rospkg
-from pathlib import Path
 from std_srvs.srv import Empty
-
-from pyvoyis import Configuration, VoyisAPI
+import xmlrpclib
+import time
+import socket
 
 
 class VoyisROS:
     def __init__(self):
         rospy.init_node("pyvoyis_ros_node", log_level=rospy.INFO)
 
-        rospack = rospkg.RosPack()
-
-        try:
-            package_path = rospack.get_path("pyvoyis_ros")
-        except rospkg.ResourceNotFound:
-            rospy.logerr("pyvoyis_ros package not found")
-            return
-
-        default_configuration_file = Path(package_path) / "configuration.yaml"
-
-        if not default_configuration_file.is_file():
-            rospy.logerr("Default configuration file not found")
-            rospy.logerr("Please create a configuration file in {}".format(default_configuration_file))
-            return
-
         # Get parameters
         configuration_file = rospy.get_param(
-            "~configuration_file",
-            str(default_configuration_file))
+            "~configuration_file")
+        
+        time.sleep(5)
+        print("Trying to connect to http://localhost:8000")
 
-        self.config = Configuration(configuration_file)
-        self.api = VoyisAPI(self.config)
+        self.xmlrpc_server = xmlrpclib.ServerProxy('http://localhost:8000')    
+        print("Trying to call RUN...")
+        while True:
+            try:    
+                self.xmlrpc_server.run(configuration_file)
+                time.sleep(1)
+            except socket.error, exc:
+                print "Caught exception socket.error : %s" % exc    
+            break
+        
 
         # Offer start_acquisition service
         rospy.Service("~start_acquisition", Empty, self.start_acquisition_srv_cb)
         # Offer stop_acquisition service
         rospy.Service("~stop_acquisition", Empty, self.stop_acquisition_srv_cb)
 
-        self.api.run()
-
+        print("Ready")
         # Spin as a single-threaded node
-        rospy.spin()
+        r = rospy.Rate(1)
+        while not rospy.is_shutdown():
+            r.sleep()
+        self.xmlrpc_server.kill()
+
 
     def start_acquisition_srv_cb(self, req):
-        self.api.request_acquisition()
-        return True
+        self.xmlrpc_server.start_acquisition()
 
     def stop_acquisition_srv_cb(self, req):
-        self.api.request_stop()
-        return True
+        self.xmlrpc_server.stop_acquisition()
 
 
 if __name__ == '__main__':
