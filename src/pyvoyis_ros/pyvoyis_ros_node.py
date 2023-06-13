@@ -42,6 +42,9 @@ class VoyisROS:
         # Offer stop_acquisition service
         rospy.Service("~stop_acquisition", Empty, self.stop_acquisition_srv_cb)
 
+        # Sync time manually
+        self.api.sync_time_manually()
+
         self.api.run()
 
         # Spin as a single-threaded node
