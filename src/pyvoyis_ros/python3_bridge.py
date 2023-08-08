@@ -6,18 +6,19 @@ from pyvoyis import Configuration, VoyisAPI
 import threading
 import time
 
+
 # Restrict to a particular path.
 class RequestHandler(SimpleXMLRPCRequestHandler):
-    rpc_paths = ('/RPC2',)
+    rpc_paths = ("/RPC2",)
+
 
 class PyVoyisXMLRPCServer:
     def __init__(self):
         # Create server
-        self.server = SimpleXMLRPCServer((
-            "localhost", 8000),
-            requestHandler=RequestHandler,
-            allow_none=True)
-        
+        self.server = SimpleXMLRPCServer(
+            ("localhost", 8000), requestHandler=RequestHandler, allow_none=True
+        )
+
         self.api = None
         self.asked_to_run = False
 
@@ -31,13 +32,13 @@ class PyVoyisXMLRPCServer:
         print("Serving forever...")
         self.server.serve_forever()
 
-
     def api_thread(self):
         while not self.asked_to_run:
             print("sleeping thread...")
             time.sleep(5)
         print("Called to RUN!")
         self.api = VoyisAPI(self.config)
+        self.api.sync_time_manually()
         self.api.run()
 
     def run(self, configuration_file):
@@ -47,7 +48,7 @@ class PyVoyisXMLRPCServer:
         self.server.register_function(self.stop_acquisition)
         self.asked_to_run = True
         return True
-    
+
     def kill(self):
         if self.api:
             self.api.shutdown()
@@ -62,5 +63,6 @@ class PyVoyisXMLRPCServer:
         self.api.request_stop()
         return True
 
+
 if __name__ == "__main__":
-    server = PyVoyisXMLRPCServer()   
+    server = PyVoyisXMLRPCServer()
