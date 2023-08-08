@@ -18,7 +18,7 @@ range_input:
 
 parameters:
   # Stills camera
-  stills_freq_hz: 0.5
+  stills_freq_hz: 1.0
   stills_exp_us: 5000
 
   # Undistort images
@@ -51,18 +51,18 @@ parameters:
   stills_advanced_adaptive_lighting: 0
 
   # Laser camera
-  laser_freq_hz: 20.0
-  laser_exp_us: 1000
+  laser_freq_hz: 1.0
+  laser_exp_us: 5000
   save_laser_images: true
   laser_gain_percentage: 100
 
   # Range gating
-  laser_disable_range_gating: false
+  laser_disable_range_gating: true
   laser_min_range_cm: 100
   laser_max_range_cm: 1000
 
   # LED panel
-  led_panel_intensity_percentage: 100
+  led_panel_intensity_percentage: 10
 
   # Refraction
   index_of_refraction: 1.35
