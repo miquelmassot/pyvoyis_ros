@@ -3,7 +3,7 @@
 
 
 import rospy
-from std_srvs.srv import Empty
+from std_srvs.srv import Empty, EmptyResponse
 import xmlrpclib
 import time
 import socket
@@ -46,9 +46,11 @@ class VoyisROS:
 
     def start_acquisition_srv_cb(self, req):
         self.xmlrpc_server.start_acquisition()
+        return EmptyResponse()
 
     def stop_acquisition_srv_cb(self, req):
         self.xmlrpc_server.stop_acquisition()
+        return EmptyResponse()
 
 
 if __name__ == '__main__':
