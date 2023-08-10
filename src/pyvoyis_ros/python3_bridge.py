@@ -38,7 +38,6 @@ class PyVoyisXMLRPCServer:
             time.sleep(5)
         print("Called to RUN!")
         self.api = VoyisAPI(self.config)
-        self.api.sync_time_manually()
         self.api.run()
 
     def run(self, configuration_file):
